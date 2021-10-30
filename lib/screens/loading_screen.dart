@@ -10,27 +10,40 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  double latitude;
+  double longitude;
+
   @override
   void initState() {
     super.initState();
     getLocation();
-    getData();
   }
 
   void getLocation() async {
     Location location = Location();
     await location.getLocation();
+
+    latitude = location.latitude;
+    longitude = location.longitude;
+
+    getData();
   }
 
   void getData() async {
     http.Response response = await http.get(
-        'https://api.openweathermap.org/data/2.5/weather?lat=37&lon=-122&appid=ffb82e40383a55594c05650394af8342');
-    String data = response.body;
-    print(data);
-    print(jsonDecode(data)['name']);
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=ffb82e40383a55594c05650394af8342');
 
-    var long = jsonDecode(data)['coord']['lon'];
-    print(long);
+    if (response.statusCode == 200) {
+      String data = response.body;
+      var temperature = jsonDecode(data)['main']['temp'];
+      var condition = jsonDecode(data)['weather'][0]['id'];
+      var cityName = jsonDecode(data)['name'];
+      print(temperature);
+      print(cityName);
+      print(condition);
+    } else {
+      print(response.statusCode);
+    }
   }
 
   @override

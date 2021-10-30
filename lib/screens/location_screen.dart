@@ -1,3 +1,4 @@
+import 'package:clima/screens/city_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
 import 'package:clima/services/weather.dart';
@@ -14,6 +15,7 @@ class LocationScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationScreen> {
   int temperature;
   String weatherIcon;
+  String weatherMessage;
   String cityName;
   WeatherModel model = WeatherModel();
 
@@ -24,10 +26,20 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void updateUI(dynamic weatherData) {
-    temperature = weatherData['main']['temp'].toInt();
-    weatherIcon = model.getWeatherIcon(weatherData['weather'][0]['id']);
-    cityName = weatherData['name'];
-    print('updating UI ' + temperature.toString() + " " + cityName);
+    setState(() {
+      if (weatherData == null) {
+        temperature = 0;
+        weatherIcon = 'Error';
+        weatherMessage = 'Unable to get weather data';
+        cityName = '';
+        return;
+      }
+      temperature = weatherData['main']['temp'].toInt();
+      weatherIcon = model.getWeatherIcon(weatherData['weather'][0]['id']);
+      weatherMessage = model.getMessage(temperature);
+      cityName = weatherData['name'];
+      print('updating UI ' + temperature.toString() + " " + cityName);
+    });
   }
 
   @override
@@ -62,7 +74,12 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return CityScreen();
+                      }));
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -88,7 +105,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "${model.getMessage(temperature)} in $cityName",
+                  "$weatherMessage in $cityName",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),

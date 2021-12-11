@@ -80,7 +80,10 @@ class _LocationScreenState extends State<LocationScreen> {
                         return CityScreen();
                       })
                       );
-                      print(typedName);
+                      if (typedName != null){
+                        var weatherData = await model.getCityWeather(typedName);
+                        updateUI(weatherData);
+                      };
                     },
                     child: Icon(
                       Icons.location_city,

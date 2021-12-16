@@ -1,4 +1,4 @@
-# Clima ☁
+# Clima ☁ - a wrather app
 
 ## Our Goal
 
